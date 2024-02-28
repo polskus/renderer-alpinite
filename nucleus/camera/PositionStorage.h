@@ -86,6 +86,12 @@ inline nucleus::camera::Definition wien()
     const auto coords = srs::lat_long_alt_to_world({48.20851144787232, 16.373082444395656, 171.28});
     return {{coords.x + 10'000, coords.y + 2'000, coords.z + 1'000}, coords};
 }
+inline nucleus::camera::Definition wien_innenstadt()
+{
+    const auto coords_lookat = srs::lat_long_alt_to_world({ 48.209839, 16.379786, 1324.31 });
+    const auto coords_position = srs::lat_long_alt_to_world({ 48.210268, 16.383799, 1918.59 });
+    return { coords_position, coords_lookat };
+}
 
 } // namespace nucleus::camera::stored_positions
 
@@ -103,6 +109,7 @@ private:
         _positions.insert({"schneeberg", nucleus::camera::stored_positions::schneeberg()});
         _positions.insert({"karwendel", nucleus::camera::stored_positions::karwendel()});
         _positions.insert({"wien", nucleus::camera::stored_positions::wien()});
+        _positions.insert({ "wien_innenstadt", nucleus::camera::stored_positions::wien_innenstadt() });
         _positions.insert({"grossglockner_shadow", nucleus::camera::stored_positions::grossglockner_shadow()});
         _positions.insert({"weichtalhaus", nucleus::camera::stored_positions::weichtalhaus()});
     }
