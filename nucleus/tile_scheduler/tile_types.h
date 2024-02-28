@@ -77,8 +77,10 @@ static_assert(NamedTile<TileLayer>);
 struct LayeredTile {
     tile::Id id;
     NetworkInfo network_info;
-    std::shared_ptr<QByteArray> ortho;
-    std::shared_ptr<QByteArray> height;
+    std::shared_ptr<QByteArray> indices;
+    std::shared_ptr<QByteArray> positions;
+    std::shared_ptr<QByteArray> uvs;
+    std::shared_ptr<QByteArray> texture;
 };
 static_assert(NamedTile<LayeredTile>);
 
@@ -102,9 +104,10 @@ static_assert(NamedTile<GpuCacheInfo>);
 struct GpuLayeredTile {
     tile::Id id;
     tile::SrsAndHeightBounds bounds = {};
-    std::shared_ptr<const QImage> ortho;
-    std::shared_ptr<const nucleus::Raster<uint16_t>> height;
-    std::shared_ptr<const QImage> height_image;
+    std::shared_ptr<const std::vector<glm::uvec3>> indices;
+    std::shared_ptr<const std::vector<glm::dvec3>> positions;
+    std::shared_ptr<const std::vector<glm::dvec2>> uvs;
+    std::shared_ptr<const QImage> texture;
 };
 static_assert(NamedTile<GpuLayeredTile>);
 
