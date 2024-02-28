@@ -43,10 +43,10 @@ struct TileSet {
         }
         [[nodiscard]] bool isValid() const { return tile_id.zoom_level < 100; }
     };
-
-    std::unique_ptr<QOpenGLTexture> ortho_texture;
-    std::unique_ptr<QOpenGLBuffer> heightmap_buffer;
-    std::unique_ptr<QOpenGLTexture> heightmap_texture;
+    std::unique_ptr<QOpenGLBuffer> index_buffer; // uvec3
+    std::unique_ptr<QOpenGLBuffer> vertex_buffer; // dvec3
+    std::unique_ptr<QOpenGLBuffer> uv_buffer; // dvec2
+    std::unique_ptr<QOpenGLTexture> texture;
     std::unique_ptr<QOpenGLVertexArrayObject> vao;
     std::vector<std::pair<tile::Id, tile::SrsBounds>> tiles;
     int gl_element_count = -1;

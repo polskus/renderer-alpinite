@@ -62,9 +62,11 @@ public slots:
     void set_aabb_decorator(const nucleus::tile_scheduler::utils::AabbDecoratorPtr& new_aabb_decorator);
 
 private:
-    void add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, const QImage& ortho, const nucleus::Raster<uint16_t>& heights, const QImage& height_texture);
+    void add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, std::shared_ptr<QByteArray> indices, std::shared_ptr<QByteArray> positions,
+        std::shared_ptr<QByteArray> uvs, std::shared_ptr<QImage> texture);
     struct TileGLAttributeLocations {
-        int height = -1;
+        int vertices = 0;
+        int uvs = 1;
     };
 
     static constexpr auto N_EDGE_VERTICES = 65;

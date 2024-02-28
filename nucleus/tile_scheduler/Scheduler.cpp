@@ -170,25 +170,18 @@ void Scheduler::update_gpu_quads()
                            gpu_quad.tiles[i].id = quad.tiles[i].id;
                            gpu_quad.tiles[i].bounds = m_aabb_decorator->aabb(quad.tiles[i].id);
 
-                           // unpacking the byte data takes long
-                           const auto* ortho_data = m_default_ortho_tile.get();
-                           if (quad.tiles[i].ortho->size()) {
-                               ortho_data = quad.tiles[i].ortho.get();
-                           }
-                           auto ortho = nucleus::utils::tile_conversion::toQImage(*ortho_data);
-                           gpu_quad.tiles[i].ortho = std::make_shared<QImage>(std::move(ortho));
+                           gpu_quad.tiles[i].indices = quad.tiles[i].indices;
+                           gpu_quad.tiles[i].positions = quad.tiles[i].positions;
+                           gpu_quad.tiles[i].uvs = quad.tiles[i].uvs;
 
-                           const auto* height_data = m_default_height_tile.get();
-                           if (quad.tiles[i].height->size()) {
-                               height_data = quad.tiles[i].height.get();
+                           const auto* texture_data = m_default_ortho_tile.get();
+                           if (quad.tiles[i].texture->size()) {
+                               texture_data = quad.tiles[i].texture.get();
                            }
-                           auto heightimage = nucleus::utils::tile_conversion::toQImage(*height_data);
-                           gpu_quad.tiles[i].height_image = std::make_shared<QImage>(std::move(heightimage));
-                           //TODO: We dont need height in VBO anymore!!! Delete at some point!!
-                           auto heightraster = nucleus::utils::tile_conversion::qImage2uint16Raster(
-                               nucleus::utils::tile_conversion::toQImage(*height_data));
-                           gpu_quad.tiles[i].height = std::make_shared<nucleus::Raster<uint16_t>>(
-                               std::move(heightraster));
+
+                           auto texture = nucleus::utils::tile_conversion::toQImage(*texture_data);
+                           gpu_quad.tiles[i].texture = std::make_shared<QImage>(std::move(texture));
+                           qDebug() << "Texture: " << gpu_quad.tiles[i].texture->width() << "x" << gpu_quad.tiles[i].texture->height();
                        }
                        return gpu_quad;
                    });

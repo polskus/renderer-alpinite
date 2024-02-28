@@ -104,10 +104,10 @@ static_assert(NamedTile<GpuCacheInfo>);
 struct GpuLayeredTile {
     tile::Id id;
     tile::SrsAndHeightBounds bounds = {};
-    std::shared_ptr<const std::vector<glm::uvec3>> indices;
-    std::shared_ptr<const std::vector<glm::dvec3>> positions;
-    std::shared_ptr<const std::vector<glm::dvec2>> uvs;
-    std::shared_ptr<const QImage> texture;
+    std::shared_ptr<QByteArray> indices; // uvec3
+    std::shared_ptr<QByteArray> positions; // dvec3
+    std::shared_ptr<QByteArray> uvs; // dvec2
+    std::shared_ptr<QImage> texture; // png
 };
 static_assert(NamedTile<GpuLayeredTile>);
 

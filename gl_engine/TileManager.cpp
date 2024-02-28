@@ -181,12 +181,14 @@ void TileManager::set_aabb_decorator(const nucleus::tile_scheduler::utils::AabbD
     m_draw_list_generator.set_aabb_decorator(new_aabb_decorator);
 }
 
-void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, const QImage& ortho_texture, const nucleus::Raster<uint16_t>& height_map, const QImage& height_texture)
+void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, std::shared_ptr<QByteArray> indices, std::shared_ptr<QByteArray> positions,
+    std::shared_ptr<QByteArray> uvs, std::shared_ptr<QImage> texture)
 {
     if (!QOpenGLContext::currentContext()) // can happen during shutdown.
         return;
 
-    assert(m_attribute_locations.height != -1);
+    assert(m_attribute_locations.vertices != -1);
+    assert(m_attribute_locations.uvs != -1);
     auto* f = QOpenGLContext::currentContext()->extraFunctions();
     // need to call GLWindow::makeCurrent, when calling through signals?
     // find an empty slot => todo, for now just create a new tile every time.
@@ -197,29 +199,41 @@ void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, 
     tileset.vao->create();
     tileset.vao->bind();
     { // vao state
-        tileset.heightmap_buffer = std::make_unique<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer);
-        tileset.heightmap_buffer->create();
-        tileset.heightmap_buffer->bind();
-        tileset.heightmap_buffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
-        auto height_buffer = prepare_altitude_buffer(height_map);
-        tileset.heightmap_buffer->allocate(height_buffer.data(), bufferLengthInBytes(height_buffer));
-        f->glEnableVertexAttribArray(GLuint(m_attribute_locations.height));
-        f->glVertexAttribPointer(GLuint(m_attribute_locations.height), /*size*/ 1, /*type*/ GL_UNSIGNED_SHORT, /*normalised*/ GL_TRUE, /*stride*/ 0, nullptr);
+        tileset.index_buffer = std::make_unique<QOpenGLBuffer>(QOpenGLBuffer::IndexBuffer);
+        tileset.index_buffer->create();
+        tileset.index_buffer->bind();
+        tileset.index_buffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
+        tileset.index_buffer->allocate(indices->data(), indices->size());
 
-        m_index_buffers[0].first->bind();
-        tileset.gl_element_count = int(m_index_buffers[0].second);
-        tileset.gl_index_type = GL_UNSIGNED_SHORT;
+        tileset.gl_element_count = indices->size();
+        tileset.gl_index_type = GL_UNSIGNED_INT;
+
+        tileset.vertex_buffer = std::make_unique<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer);
+        tileset.vertex_buffer->create();
+        tileset.vertex_buffer->bind();
+        tileset.vertex_buffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
+        tileset.vertex_buffer->allocate(positions->data(), positions->size());
+
+        f->glEnableVertexAttribArray(GLuint(m_attribute_locations.vertices));
+        f->glVertexAttribPointer(
+            GLuint(m_attribute_locations.vertices), /*size*/ 3, /*type*/ GL_DOUBLE, /*normalised*/ GL_FALSE, /*stride*/ 3 * sizeof(double), nullptr);
+
+        tileset.uv_buffer = std::make_unique<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer);
+        tileset.uv_buffer->create();
+        tileset.uv_buffer->bind();
+        tileset.uv_buffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
+        tileset.uv_buffer->allocate(uvs->data(), uvs->size());
+
+        f->glEnableVertexAttribArray(GLuint(m_attribute_locations.uvs));
+        f->glVertexAttribPointer(
+            GLuint(m_attribute_locations.uvs), /*size*/ 2, /*type*/ GL_DOUBLE, /*normalised*/ GL_FALSE, /*stride*/ 2 * sizeof(double), nullptr);
     }
     tileset.vao->release();
-    tileset.ortho_texture = std::make_unique<QOpenGLTexture>(ortho_texture);
-    tileset.ortho_texture->setMaximumAnisotropy(m_max_anisotropy);
-    tileset.ortho_texture->setWrapMode(QOpenGLTexture::WrapMode::ClampToEdge);
-    tileset.ortho_texture->setMinMagFilters(QOpenGLTexture::Filter::LinearMipMapLinear, QOpenGLTexture::Filter::Linear);
-    tileset.ortho_texture->generateMipMaps();
-
-    tileset.heightmap_texture = std::make_unique<QOpenGLTexture>(height_texture);
-    tileset.heightmap_texture->setWrapMode(QOpenGLTexture::WrapMode::ClampToEdge);
-    tileset.heightmap_texture->setMinMagFilters(QOpenGLTexture::Filter::Nearest, QOpenGLTexture::Filter::Nearest);
+    tileset.texture = std::make_unique<QOpenGLTexture>(*texture);
+    tileset.texture->setMaximumAnisotropy(m_max_anisotropy);
+    tileset.texture->setWrapMode(QOpenGLTexture::WrapMode::ClampToEdge);
+    tileset.texture->setMinMagFilters(QOpenGLTexture::Filter::LinearMipMapLinear, QOpenGLTexture::Filter::Linear);
+    tileset.texture->generateMipMaps();
 
     // add to m_gpu_tiles
     m_gpu_tiles.push_back(std::move(tileset));
@@ -239,10 +253,11 @@ void TileManager::update_gpu_quads(const std::vector<nucleus::tile_scheduler::ti
         for (const auto& tile : quad.tiles) {
             // test for validity
             assert(tile.id.zoom_level < 100);
-            assert(tile.height);
-            assert(tile.ortho);
-            assert(tile.height_image);
-            add_tile(tile.id, tile.bounds, *tile.ortho, *tile.height, *tile.height_image);
+            assert(tile.indices);
+            assert(tile.positions);
+            assert(tile.uvs);
+            assert(tile.texture);
+            add_tile(tile.id, tile.bounds, tile.indices, tile.positions, tile.uvs, tile.texture);
         }
     }
     for (const auto& quad : deleted_quads) {
