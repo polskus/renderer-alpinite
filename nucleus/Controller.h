@@ -50,6 +50,7 @@ private:
     std::unique_ptr<QThread> m_scheduler_thread;
 #endif
     std::unique_ptr<tile_scheduler::TileLoadService> m_terrain_service;
+    std::unique_ptr<tile_scheduler::TileLoadService> m_gltf_terrain_service;
     std::unique_ptr<tile_scheduler::TileLoadService> m_ortho_service;
     std::unique_ptr<tile_scheduler::Scheduler> m_tile_scheduler;
     std::unique_ptr<DataQuerier> m_data_querier;

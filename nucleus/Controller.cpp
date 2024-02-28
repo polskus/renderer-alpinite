@@ -37,6 +37,7 @@
 #include "nucleus/tile_scheduler/TileLoadService.h"
 #include "nucleus/tile_scheduler/utils.h"
 #include "radix/TileHeights.h"
+#include "tile_scheduler/alpinite/GLTFReader.h"
 
 using namespace nucleus::tile_scheduler;
 
@@ -49,6 +50,7 @@ Controller::Controller(AbstractRenderWindow* render_window)
     qRegisterMetaType<nucleus::event_parameter::Wheel>();
 
     m_terrain_service = std::make_unique<TileLoadService>("https://alpinemaps.cg.tuwien.ac.at/tiles/alpine_png/", TileLoadService::UrlPattern::ZXY, ".png");
+    m_gltf_terrain_service = std::make_unique<TileLoadService>("http://localhost/", TileLoadService::UrlPattern::ZYX_yPointingSouth, ".glb");
     //    m_ortho_service.reset(new TileLoadService("https://tiles.bergfex.at/styles/bergfex-osm/", TileLoadService::UrlPattern::ZXY_yPointingSouth, ".jpeg"));
     //    m_ortho_service.reset(new TileLoadService("https://alpinemaps.cg.tuwien.ac.at/tiles/ortho/", TileLoadService::UrlPattern::ZYX_yPointingSouth, ".jpeg"));
     //    m_ortho_service.reset(new TileLoadService(
@@ -78,17 +80,23 @@ Controller::Controller(AbstractRenderWindow* render_window)
         SlotLimiter* sl = new SlotLimiter(sch);
         RateLimiter* rl = new RateLimiter(sch);
         QuadAssembler* qa = new QuadAssembler(sch);
-        LayerAssembler* la = new LayerAssembler(sch);
+        // LayerAssembler* la = new LayerAssembler(sch);
+        GLTFReader* gltf_reader = new GLTFReader();
+
         connect(sch, &Scheduler::quads_requested, sl, &SlotLimiter::request_quads);
         connect(sl, &SlotLimiter::quad_requested, rl, &RateLimiter::request_quad);
         connect(rl, &RateLimiter::quad_requested, qa, &QuadAssembler::load);
-        connect(qa, &QuadAssembler::tile_requested, la, &LayerAssembler::load);
-        connect(la, &LayerAssembler::tile_requested, m_ortho_service.get(), &TileLoadService::load);
-        connect(la, &LayerAssembler::tile_requested, m_terrain_service.get(), &TileLoadService::load);
+        // connect(qa, &QuadAssembler::tile_requested, la, &LayerAssembler::load);
+        // connect(la, &LayerAssembler::tile_requested, m_ortho_service.get(), &TileLoadService::load);
+        // connect(la, &LayerAssembler::tile_requested, m_terrain_service.get(), &TileLoadService::load);
 
-        connect(m_ortho_service.get(), &TileLoadService::load_finished, la, &LayerAssembler::deliver_ortho);
-        connect(m_terrain_service.get(), &TileLoadService::load_finished, la, &LayerAssembler::deliver_height);
-        connect(la, &LayerAssembler::tile_loaded, qa, &QuadAssembler::deliver_tile);
+        connect(qa, &QuadAssembler::tile_requested, m_gltf_terrain_service.get(), &TileLoadService::load);
+        connect(m_gltf_terrain_service.get(), &TileLoadService::load_finished, gltf_reader, &GLTFReader::deliver_tile);
+        connect(gltf_reader, &GLTFReader::tile_read, qa, &QuadAssembler::deliver_tile);
+
+        // connect(m_ortho_service.get(), &TileLoadService::load_finished, la, &LayerAssembler::deliver_ortho);
+        // connect(m_terrain_service.get(), &TileLoadService::load_finished, la, &LayerAssembler::deliver_height);
+        // connect(la, &LayerAssembler::tile_loaded, qa, &QuadAssembler::deliver_tile);
         connect(qa, &QuadAssembler::quad_loaded, sl, &SlotLimiter::deliver_quad);
         connect(sl, &SlotLimiter::quad_delivered, sch, &Scheduler::receive_quad);
     }
