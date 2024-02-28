@@ -62,7 +62,7 @@ qt_add_library(nucleus STATIC
     Tile.cpp Tile.h
     tile_scheduler/utils.h tile_scheduler/utils.cpp
     tile_scheduler/DrawListGenerator.h tile_scheduler/DrawListGenerator.cpp
-    tile_scheduler/LayerAssembler.h tile_scheduler/LayerAssembler.cpp
+
     tile_scheduler/tile_types.h
     tile_scheduler/constants.h
     tile_scheduler/QuadAssembler.h tile_scheduler/QuadAssembler.cpp

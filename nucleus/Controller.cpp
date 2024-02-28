@@ -29,7 +29,6 @@
 #include "AbstractRenderWindow.h"
 #include "nucleus/camera/Controller.h"
 #include "nucleus/camera/PositionStorage.h"
-#include "nucleus/tile_scheduler/LayerAssembler.h"
 #include "nucleus/tile_scheduler/QuadAssembler.h"
 #include "nucleus/tile_scheduler/RateLimiter.h"
 #include "nucleus/tile_scheduler/Scheduler.h"
