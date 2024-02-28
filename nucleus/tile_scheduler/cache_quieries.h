@@ -38,20 +38,20 @@ inline float query_altitude(MemoryCache* cache, const glm::dvec2& lat_long)
         return false;
     });
 
-    for (const auto& layered_tile : selected_quad.tiles) {
-        if (srs::tile_bounds(layered_tile.id).contains(world_space)) {
-            const auto bounds = srs::tile_bounds(layered_tile.id);
-            const auto uv = (world_space - bounds.min) / bounds.size();
-            const auto height_tile = QImage::fromData(*layered_tile.height);
-            assert(!height_tile.isNull());
-            if (height_tile.isNull())
-                return 1000;
-            const auto x = int(uv.x * height_tile.width());
-            const auto y = int((1 - uv.y) * height_tile.height());
-            const auto rgb = QColor(height_tile.pixel(x, y));
-            return radix::height_encoding::to_float({rgb.red(), rgb.green(), rgb.blue()});
-        }
-    }
+    // for (const auto& layered_tile : selected_quad.tiles) {
+    //     if (srs::tile_bounds(layered_tile.id).contains(world_space)) {
+    //         const auto bounds = srs::tile_bounds(layered_tile.id);
+    //         const auto uv = (world_space - bounds.min) / bounds.size();
+    //         const auto height_tile = QImage::fromData(*layered_tile.height);
+    //         assert(!height_tile.isNull());
+    //         if (height_tile.isNull())
+    //             return 1000;
+    //         const auto x = int(uv.x * height_tile.width());
+    //         const auto y = int((1 - uv.y) * height_tile.height());
+    //         const auto rgb = QColor(height_tile.pixel(x, y));
+    //         return radix::height_encoding::to_float({rgb.red(), rgb.green(), rgb.blue()});
+    //     }
+    // }
 
     assert(false);
     return 1000;
