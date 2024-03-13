@@ -129,7 +129,7 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
     cgltf_image& albedo_image = *albedo_texture.image;
 
     std::shared_ptr<QByteArray> qb_raw_texture
-        = std::make_shared<QByteArray>(reinterpret_cast<const char*>(cgltf_buffer_view_data(albedo_image.buffer_view)), albedo_image.buffer_view->size);
+        = std::make_shared<QByteArray>((char*)cgltf_buffer_view_data(albedo_image.buffer_view), albedo_image.buffer_view->size);
 
     // OLD CONVERT FROM FLOAT + OFFSET TO DOUBLE
     // std::vector<glm::dvec3> positionsd;
@@ -146,8 +146,25 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
 
     // NEW CONVERT FROM FLOAT + OFFSET TO FLOAT, TO KEEP THE FLOAT WORKFLOW IN THE SHADERS
     for (unsigned int i = 0; i < positions.size(); i++) {
-        positions[i] = glm::vec3(glm::dvec3(positions[i]) + offset);
+        positions[i] = (glm::vec3)(glm::dvec3(positions[i]) + offset);
     }
+
+    unsigned int max_index = positions.size() - 1;
+    for (unsigned int i = 0; i < indices.size(); i++) {
+        if (indices[i].x > max_index) {
+            qDebug() << "Index[" << i << "].x > max_index !!! " << indices[i].x << " > " << max_index;
+            assert(false);
+        }
+        if (indices[i].y > max_index) {
+            qDebug() << "Index[" << i << "].y > max_index !!! " << indices[i].y << " > " << max_index;
+            assert(false);
+        }
+        if (indices[i].z > max_index) {
+            qDebug() << "Index[" << i << "].z > max_index !!! " << indices[i].z << " > " << max_index;
+            assert(false);
+        }
+    }
+    qDebug() << "All " << indices.size() << " indices are correct!";
 
     // OLD USE OF DOUBLE DATA
     // std::shared_ptr<QByteArray> qb_indices = std::make_shared<QByteArray>(reinterpret_cast<const char*>(indices.data()), indices.size());
@@ -155,14 +172,14 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
     // std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>(reinterpret_cast<const char*>(uvsd.data()), uvsd.size());
 
     // NEW FLOAT ONLY DATA
-    std::shared_ptr<QByteArray> qb_indices = std::make_shared<QByteArray>(reinterpret_cast<const char*>(indices.data()), indices.size());
-    std::shared_ptr<QByteArray> qb_positions = std::make_shared<QByteArray>(reinterpret_cast<const char*>(positions.data()), positions.size());
-    std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>(reinterpret_cast<const char*>(uvs.data()), uvs.size());
+    std::shared_ptr<QByteArray> qb_indices = std::make_shared<QByteArray>((char*)indices.data(), indices.size() * sizeof(glm::uvec3));
+    std::shared_ptr<QByteArray> qb_positions = std::make_shared<QByteArray>((char*)positions.data(), positions.size() * sizeof(glm::vec3));
+    std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>((char*)uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-    qDebug() << "Indices: " << qb_indices->size();
-    qDebug() << "Positions: " << qb_positions->size();
-    qDebug() << "UVs: " << qb_uvs->size();
-    qDebug() << "Texture: " << qb_raw_texture->size();
+    qDebug() << "Indices Buffer Size: " << qb_indices->size();
+    qDebug() << "Positions Buffer Size: " << qb_positions->size();
+    qDebug() << "UVs Buffer Size: " << qb_uvs->size();
+    qDebug() << "Texture Buffer Size: " << qb_raw_texture->size();
 
     cgltf_free(data_ptr);
 
