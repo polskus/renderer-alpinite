@@ -30,9 +30,9 @@ layout (location = 3) out lowp vec4 texout_depth;
 
 in highp vec2 uv;
 in highp vec3 var_pos_cws;
-in highp vec3 var_normal;
+// in highp vec3 var_normal;
 #if CURTAIN_DEBUG_MODE > 0
-in lowp float is_curtain;
+// in lowp float is_curtain;
 #endif
 flat in lowp vec3 vertex_color;
 
@@ -48,9 +48,9 @@ highp vec3 normal_by_fragment_position_interpolation() {
 
 void main() {
 #if CURTAIN_DEBUG_MODE == 2
-    if (is_curtain == 0.0) {
-        discard;
-    }
+    // if (is_curtain == 0.0) {
+    //     discard;
+    // }
 #endif
 
     // Write Albedo (ortho picture) in gbuffer
@@ -63,9 +63,11 @@ void main() {
     texout_position = vec4(var_pos_cws, dist);
 
     // Write and encode normal in gbuffer
-    highp vec3 normal = vec3(0.0);
-    if (conf.normal_mode == 0u) normal = normal_by_fragment_position_interpolation();
-    else normal = var_normal;
+    // highp vec3 normal = vec3(0.0);
+    // if (conf.normal_mode == 0u) normal = normal_by_fragment_position_interpolation();
+    // else normal = var_normal;
+    // texout_normal = octNormalEncode2u16(normal);
+    highp vec3 normal = normal_by_fragment_position_interpolation();
     texout_normal = octNormalEncode2u16(normal);
 
     // Write and encode distance for readback

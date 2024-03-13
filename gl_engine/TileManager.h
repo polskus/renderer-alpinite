@@ -65,8 +65,8 @@ private:
     void add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, std::shared_ptr<QByteArray> indices, std::shared_ptr<QByteArray> positions,
         std::shared_ptr<QByteArray> uvs, std::shared_ptr<QImage> texture);
     struct TileGLAttributeLocations {
-        int vertices = 0;
-        int uvs = 1;
+        int vertices = -1;
+        int uvs = -1;
     };
 
     static constexpr auto N_EDGE_VERTICES = 65;

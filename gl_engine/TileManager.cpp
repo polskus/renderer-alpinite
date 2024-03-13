@@ -122,9 +122,9 @@ void TileManager::draw(ShaderProgram* shader_program, const nucleus::camera::Def
                        bool sort_tiles, glm::dvec3 sort_position) const
 {
     QOpenGLExtraFunctions* f = QOpenGLContext::currentContext()->extraFunctions();
-    shader_program->set_uniform("n_edge_vertices", N_EDGE_VERTICES);
-    shader_program->set_uniform("texture_sampler", 2);
-    shader_program->set_uniform("height_sampler", 1);
+    // shader_program->set_uniform("n_edge_vertices", N_EDGE_VERTICES);
+    shader_program->set_uniform("texture_sampler", 1);
+    // shader_program->set_uniform("height_sampler", 1);
 
     // Sort depending on distance to sort_position
     std::vector<std::pair<float, const TileSet*>> tile_list;
@@ -145,12 +145,11 @@ void TileManager::draw(ShaderProgram* shader_program, const nucleus::camera::Def
 
     for (const auto& tileset : tile_list) {
         tileset.second->vao->bind();
-        shader_program->set_uniform_array("bounds", boundsArray(*tileset.second, camera.position()));
+        shader_program->set_uniform_array("bounds", boundsArray(*tileset.second, camera.position())); // Kept this, so that I dont get a "unused param" error
         shader_program->set_uniform("tileset_id", (int)((tileset.second->tiles[0].first.coords[0] + tileset.second->tiles[0].first.coords[1])));
         shader_program->set_uniform("tileset_zoomlevel", tileset.second->tiles[0].first.zoom_level);
-        tileset.second->ortho_texture->bind(2);
-        tileset.second->heightmap_texture->bind(1);
-        f->glDrawElements(GL_TRIANGLE_STRIP, tileset.second->gl_element_count, tileset.second->gl_index_type, nullptr);
+        tileset.second->texture->bind(1);
+        f->glDrawElements(GL_TRIANGLES, tileset.second->gl_element_count, tileset.second->gl_index_type, nullptr);
     }
     f->glBindVertexArray(0);
 }
@@ -173,7 +172,8 @@ void TileManager::remove_tile(const tile::Id& tile_id)
 
 void TileManager::initilise_attribute_locations(ShaderProgram* program)
 {
-    m_attribute_locations.height = program->attribute_location("altitude");
+    m_attribute_locations.vertices = program->attribute_location("in_pos");
+    m_attribute_locations.uvs = program->attribute_location("in_uv");
 }
 
 void TileManager::set_aabb_decorator(const nucleus::tile_scheduler::utils::AabbDecoratorPtr& new_aabb_decorator)
