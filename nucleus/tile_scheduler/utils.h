@@ -274,8 +274,9 @@ namespace utils {
         constexpr auto sqrt2 = 1.414213562373095;
         const auto camera_frustum = camera.frustum();
         auto refine = [&camera, camera_frustum, error_threshold_px, tile_size, aabb_decorator](const tile::Id& tile) {
-            if (tile.zoom_level >= 18)
+            if (tile.zoom_level >= 19) {
                 return false;
+            }
 
             const auto aabb = aabb_decorator->aabb(tile);
             if (!tile_scheduler::utils::camera_frustum_contains_tile(camera_frustum, aabb))
