@@ -276,6 +276,10 @@ namespace utils {
         const auto camera_frustum = camera.frustum();
         auto refine = [&camera, camera_frustum, error_threshold_px, tile_size, aabb_decorator](const tile::Id& tile) {
             // qDebug() << "[REFINEMENT] Checking tile " << tile.zoom_level << "/" << tile.coords[0] << "/" << tile.coords[1];
+            // if (tile.zoom_level < 19) {
+            //     qDebug() << "    Refining, because tile level is smaller than 19";
+            //     return true;
+            // }
             if (tile.zoom_level >= 19) {
                 // qDebug() << "    Not refining, because tile level exceeds 18";
                 return false;
