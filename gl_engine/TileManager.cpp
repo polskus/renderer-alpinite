@@ -142,6 +142,10 @@ void TileManager::draw(ShaderProgram* shader_program, const nucleus::camera::Def
     if (sort_tiles) std::sort(tile_list.begin(), tile_list.end(), compareTileSetPair);
 
     for (const auto& tileset : tile_list) {
+        // qDebug() << "Drawing tileset:";
+        // for (auto& tile : tileset.second->tiles) {
+        //     qDebug() << "    TILE " << tile.first.zoom_level << "/" << tile.first.coords[0] << "/" << tile.first.coords[1];
+        // }
         tileset.second->vao->bind();
         shader_program->set_uniform_array("bounds", boundsArray(*tileset.second, camera.position())); // Kept this, so that I dont get a "unused param" error
         shader_program->set_uniform("tileset_id", (int)((tileset.second->tiles[0].first.coords[0] + tileset.second->tiles[0].first.coords[1])));
@@ -184,6 +188,8 @@ void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, 
 {
     if (!QOpenGLContext::currentContext()) // can happen during shutdown.
         return;
+
+    qDebug() << "Add tile " << id.zoom_level << "/" << id.coords[0] << "/" << id.coords[1];
 
     assert(m_attribute_locations.vertices != -1);
     assert(m_attribute_locations.uvs != -1);

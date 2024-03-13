@@ -288,6 +288,10 @@ std::vector<tile::Id> Scheduler::tiles_for_current_camera_position() const
                                              m_ortho_tile_size),
         [&all_inner_nodes](const tile::Id &v) {
             all_inner_nodes.push_back(v);
+            // qDebug() << "    Adding tile to inner nodes: " << v.zoom_level << "/" << v.coords[0] << "/" << v.coords[1];
+            // for (auto& c : v.children()) {
+            //     qDebug() << "       Throwing away child node: " << c.zoom_level << "/" << c.coords[0] << "/" << c.coords[1];
+            // }
             return v.children();
         });
 

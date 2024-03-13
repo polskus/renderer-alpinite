@@ -48,6 +48,8 @@ void TileLoadService::load(const tile::Id& tile_id)
     request.setAttribute(QNetworkRequest::UseCredentialsAttribute, false);
 #endif
 
+    qDebug() << build_tile_url(tile_id);
+
     QNetworkReply* reply = m_network_manager->get(request);
     connect(reply, &QNetworkReply::finished, [tile_id, reply, this]() {
         const auto error = reply->error();

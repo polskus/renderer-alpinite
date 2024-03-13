@@ -23,6 +23,7 @@
 #endif
 
 #include <QByteArray>
+#include <QDebug>
 
 #include "constants.h"
 #include "nucleus/camera/Definition.h"
@@ -274,18 +275,24 @@ namespace utils {
         constexpr auto sqrt2 = 1.414213562373095;
         const auto camera_frustum = camera.frustum();
         auto refine = [&camera, camera_frustum, error_threshold_px, tile_size, aabb_decorator](const tile::Id& tile) {
+            // qDebug() << "[REFINEMENT] Checking tile " << tile.zoom_level << "/" << tile.coords[0] << "/" << tile.coords[1];
             if (tile.zoom_level >= 19) {
+                // qDebug() << "    Not refining, because tile level exceeds 18";
                 return false;
             }
 
             const auto aabb = aabb_decorator->aabb(tile);
-            if (!tile_scheduler::utils::camera_frustum_contains_tile(camera_frustum, aabb))
+            if (!tile_scheduler::utils::camera_frustum_contains_tile(camera_frustum, aabb)) {
+                // qDebug() << "    Not refining, because tile is not in frustum";
                 return false;
+            }
 
             const auto distance = float(geometry::distance(aabb, camera.position()));
             const auto pixel_size = float(sqrt2 * aabb.size().x / tile_size);
 
-            return camera.to_screen_space(pixel_size, distance) >= error_threshold_px;
+            bool result = camera.to_screen_space(pixel_size, distance) >= error_threshold_px;
+            // qDebug() << "    Refining due to appropriate pixel error? " << result;
+            return result;
         };
         return refine;
     }

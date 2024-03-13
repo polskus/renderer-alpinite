@@ -24,6 +24,7 @@ void GLTFReader::deliver_tile(const tile_types::TileLayer& tile)
 
         emit tile_read(loaded_tile);
     } else {
+        qDebug() << "Emitting dummy tile";
         emit tile_read(dummy);
     }
 }
