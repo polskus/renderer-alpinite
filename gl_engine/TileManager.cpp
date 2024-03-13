@@ -216,7 +216,7 @@ void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, 
 
         f->glEnableVertexAttribArray(GLuint(m_attribute_locations.vertices));
         f->glVertexAttribPointer(
-            GLuint(m_attribute_locations.vertices), /*size*/ 3, /*type*/ GL_DOUBLE, /*normalised*/ GL_FALSE, /*stride*/ 3 * sizeof(double), nullptr);
+            GLuint(m_attribute_locations.vertices), /*size*/ 3, /*type*/ GL_FLOAT, /*normalised*/ GL_FALSE, /*stride*/ 3 * sizeof(float), nullptr);
 
         tileset.uv_buffer = std::make_unique<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer);
         tileset.uv_buffer->create();
@@ -226,7 +226,7 @@ void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, 
 
         f->glEnableVertexAttribArray(GLuint(m_attribute_locations.uvs));
         f->glVertexAttribPointer(
-            GLuint(m_attribute_locations.uvs), /*size*/ 2, /*type*/ GL_DOUBLE, /*normalised*/ GL_FALSE, /*stride*/ 2 * sizeof(double), nullptr);
+            GLuint(m_attribute_locations.uvs), /*size*/ 2, /*type*/ GL_FLOAT, /*normalised*/ GL_FALSE, /*stride*/ 2 * sizeof(float), nullptr);
     }
     tileset.vao->release();
     tileset.texture = std::make_unique<QOpenGLTexture>(*texture);

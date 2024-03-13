@@ -105,8 +105,8 @@ struct GpuLayeredTile {
     tile::Id id;
     tile::SrsAndHeightBounds bounds = {};
     std::shared_ptr<QByteArray> indices; // uvec3
-    std::shared_ptr<QByteArray> positions; // dvec3
-    std::shared_ptr<QByteArray> uvs; // dvec2
+    std::shared_ptr<QByteArray> positions; // vec3
+    std::shared_ptr<QByteArray> uvs; // vec2
     std::shared_ptr<QImage> texture; // png
 };
 static_assert(NamedTile<GpuLayeredTile>);

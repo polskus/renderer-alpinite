@@ -130,21 +130,33 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
     std::shared_ptr<QByteArray> qb_raw_texture
         = std::make_shared<QByteArray>(reinterpret_cast<const char*>(cgltf_buffer_view_data(albedo_image.buffer_view)), albedo_image.buffer_view->size);
 
-    std::vector<glm::dvec3> positionsd;
-    positionsd.resize(positions.size());
-    for (unsigned int i = 0; i < positionsd.size(); i++) {
-        positionsd[i] = glm::dvec3(positions[i]) + offset;
+    // OLD CONVERT FROM FLOAT + OFFSET TO DOUBLE
+    // std::vector<glm::dvec3> positionsd;
+    // positionsd.resize(positions.size());
+    // for (unsigned int i = 0; i < positionsd.size(); i++) {
+    //     positionsd[i] = glm::dvec3(positions[i]) + offset;
+    // }
+
+    // std::vector<glm::dvec2> uvsd;
+    // uvsd.resize(uvs.size());
+    // for (unsigned int i = 0; i < uvsd.size(); i++) {
+    //     uvsd[i] = glm::dvec2(uvs[i]);
+    // }
+
+    // NEW CONVERT FROM FLOAT + OFFSET TO FLOAT, TO KEEP THE FLOAT WORKFLOW IN THE SHADERS
+    for (unsigned int i = 0; i < positions.size(); i++) {
+        positions[i] = glm::vec3(glm::dvec3(positions[i]) + offset);
     }
 
-    std::vector<glm::dvec2> uvsd;
-    uvsd.resize(uvs.size());
-    for (unsigned int i = 0; i < uvsd.size(); i++) {
-        uvsd[i] = glm::dvec2(uvs[i]);
-    }
+    // OLD USE OF DOUBLE DATA
+    // std::shared_ptr<QByteArray> qb_indices = std::make_shared<QByteArray>(reinterpret_cast<const char*>(indices.data()), indices.size());
+    // std::shared_ptr<QByteArray> qb_positions = std::make_shared<QByteArray>(reinterpret_cast<const char*>(positionsd.data()), positionsd.size());
+    // std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>(reinterpret_cast<const char*>(uvsd.data()), uvsd.size());
 
+    // NEW FLOAT ONLY DATA
     std::shared_ptr<QByteArray> qb_indices = std::make_shared<QByteArray>(reinterpret_cast<const char*>(indices.data()), indices.size());
-    std::shared_ptr<QByteArray> qb_positions = std::make_shared<QByteArray>(reinterpret_cast<const char*>(positionsd.data()), positionsd.size());
-    std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>(reinterpret_cast<const char*>(uvsd.data()), uvsd.size());
+    std::shared_ptr<QByteArray> qb_positions = std::make_shared<QByteArray>(reinterpret_cast<const char*>(positions.data()), positions.size());
+    std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>(reinterpret_cast<const char*>(uvs.data()), uvs.size());
 
     qDebug() << "Indices: " << qb_indices->size();
     qDebug() << "Positions: " << qb_positions->size();
