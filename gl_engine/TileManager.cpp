@@ -43,9 +43,7 @@ std::vector<glm::vec4> boundsArray(const TileSet& tileset, const glm::dvec3& cam
     std::vector<glm::vec4> ret;
     ret.reserve(tileset.tiles.size());
     for (const auto& tile : tileset.tiles) {
-        ret.emplace_back(tile.second.min.x - camera_position.x,
-            tile.second.min.y - camera_position.y,
-            tile.second.max.x - camera_position.x,
+        ret.emplace_back(tile.second.min.x - camera_position.x, tile.second.min.y - camera_position.y, tile.second.max.x - camera_position.x,
             tile.second.max.y - camera_position.y);
     }
     return ret;
