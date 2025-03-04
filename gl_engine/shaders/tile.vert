@@ -129,7 +129,10 @@ void main() {
 //         var_normal = normal_by_finite_difference_method(uv, edge_vertices_count_float, tile_width, tile_height, altitude_correction_factor);
 //     }
 
-    var_pos_cws = in_pos;
+    // Our positions are in WS,
+    // since we need to transform to Clip Space with a local view matrix, we need to manually transform
+    // the positions to camera relative positions
+    var_pos_cws = in_pos - camera.position.xyz;
     uv = in_uv;
     gl_Position = camera.view_proj_matrix * vec4(var_pos_cws, 1);
 
