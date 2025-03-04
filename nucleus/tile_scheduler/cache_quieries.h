@@ -53,8 +53,8 @@ inline float query_altitude(MemoryCache* cache, const glm::dvec2& lat_long)
     //     }
     // }
 
-    assert(false);
-    return 1000;
+    // assert(false);
+    return 175;
 }
 
 } // namespace nucleus::tile_scheduler::cache_queries
