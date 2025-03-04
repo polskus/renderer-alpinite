@@ -181,7 +181,7 @@ void Scheduler::update_gpu_quads()
 
                            auto texture = nucleus::utils::tile_conversion::toQImage(*texture_data);
                            gpu_quad.tiles[i].texture = std::make_shared<QImage>(std::move(texture));
-                           qDebug() << "Texture: " << gpu_quad.tiles[i].texture->width() << "x" << gpu_quad.tiles[i].texture->height();
+                           // qDebug() << "Texture: " << gpu_quad.tiles[i].texture->width() << "x" << gpu_quad.tiles[i].texture->height();
                        }
                        return gpu_quad;
                    });

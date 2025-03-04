@@ -189,7 +189,7 @@ void TileManager::add_tile(const tile::Id& id, tile::SrsAndHeightBounds bounds, 
     if (!QOpenGLContext::currentContext()) // can happen during shutdown.
         return;
 
-    qDebug() << "Add tile " << id.zoom_level << "/" << id.coords[0] << "/" << id.coords[1];
+    // qDebug() << "Add tile " << id.zoom_level << "/" << id.coords[0] << "/" << id.coords[1];
 
     assert(m_attribute_locations.vertices != -1);
     assert(m_attribute_locations.uvs != -1);

@@ -17,14 +17,14 @@ void GLTFReader::deliver_tile(const tile_types::TileLayer& tile)
         std::make_shared<QByteArray>(), std::make_shared<QByteArray>() };
 
     if (tile.network_info.status == tile_types::NetworkInfo::Status::Good) {
-        qDebug() << "RECV TILE: " << tile.id.zoom_level << "/" << tile.id.coords.x << "/" << tile.id.coords.y << " " << (uint64_t)tile.network_info.status
-                 << " Size: " << tile.data->size();
+        // qDebug() << "RECV TILE: " << tile.id.zoom_level << "/" << tile.id.coords.x << "/" << tile.id.coords.y << " " << (uint64_t)tile.network_info.status
+        //          << " Size: " << tile.data->size();
 
         tile_types::LayeredTile loaded_tile = load_tile_from_gltf(tile);
 
         emit tile_read(loaded_tile);
     } else {
-        qDebug() << "Emitting dummy tile";
+        // qDebug() << "Emitting dummy tile";
         emit tile_read(dummy);
     }
 }
@@ -41,12 +41,12 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
     cgltf_data* data_ptr = NULL;
     cgltf_result result = cgltf_parse(&options, buf, size, &data_ptr);
     if (result == cgltf_result_success) {
-        qDebug() << "CGLTF READ SUCCESS";
+        // qDebug() << "CGLTF READ SUCCESS";
     } else if (result == cgltf_result_invalid_gltf) {
-        qDebug() << "CGLTF INVALID GLTF";
+        // qDebug() << "CGLTF INVALID GLTF";
         return dummy;
     } else {
-        qDebug() << result;
+        // qDebug() << result;
         return dummy;
     }
 
@@ -56,11 +56,11 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
 
     // return gltf_tile;
 
-    qDebug() << "MESHES: " << data.meshes_count;
+    // qDebug() << "MESHES: " << data.meshes_count;
     assert(data.meshes_count == 1);
     cgltf_mesh& mesh = data.meshes[0];
 
-    qDebug() << "PRIMITIVES COUNT: " << mesh.primitives_count;
+    // qDebug() << "PRIMITIVES COUNT: " << mesh.primitives_count;
     assert(mesh.primitives_count == 1);
     cgltf_primitive& mesh_primitive = mesh.primitives[0];
     assert(mesh_primitive.type == cgltf_primitive_type::cgltf_primitive_type_triangles);
@@ -152,19 +152,19 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
     unsigned int max_index = positions.size() - 1;
     for (unsigned int i = 0; i < indices.size(); i++) {
         if (indices[i].x > max_index) {
-            qDebug() << "Index[" << i << "].x > max_index !!! " << indices[i].x << " > " << max_index;
+            // qDebug() << "Index[" << i << "].x > max_index !!! " << indices[i].x << " > " << max_index;
             assert(false);
         }
         if (indices[i].y > max_index) {
-            qDebug() << "Index[" << i << "].y > max_index !!! " << indices[i].y << " > " << max_index;
+            // qDebug() << "Index[" << i << "].y > max_index !!! " << indices[i].y << " > " << max_index;
             assert(false);
         }
         if (indices[i].z > max_index) {
-            qDebug() << "Index[" << i << "].z > max_index !!! " << indices[i].z << " > " << max_index;
+            // qDebug() << "Index[" << i << "].z > max_index !!! " << indices[i].z << " > " << max_index;
             assert(false);
         }
     }
-    qDebug() << "All " << indices.size() << " indices are correct!";
+    // qDebug() << "All " << indices.size() << " indices are correct!";
 
     // OLD USE OF DOUBLE DATA
     // std::shared_ptr<QByteArray> qb_indices = std::make_shared<QByteArray>(reinterpret_cast<const char*>(indices.data()), indices.size());
@@ -176,10 +176,10 @@ tile_types::LayeredTile GLTFReader::load_tile_from_gltf(const tile_types::TileLa
     std::shared_ptr<QByteArray> qb_positions = std::make_shared<QByteArray>((char*)positions.data(), positions.size() * sizeof(glm::vec3));
     std::shared_ptr<QByteArray> qb_uvs = std::make_shared<QByteArray>((char*)uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-    qDebug() << "Indices Buffer Size: " << qb_indices->size();
-    qDebug() << "Positions Buffer Size: " << qb_positions->size();
-    qDebug() << "UVs Buffer Size: " << qb_uvs->size();
-    qDebug() << "Texture Buffer Size: " << qb_raw_texture->size();
+    // qDebug() << "Indices Buffer Size: " << qb_indices->size();
+    // qDebug() << "Positions Buffer Size: " << qb_positions->size();
+    // qDebug() << "UVs Buffer Size: " << qb_uvs->size();
+    // qDebug() << "Texture Buffer Size: " << qb_raw_texture->size();
 
     cgltf_free(data_ptr);
 

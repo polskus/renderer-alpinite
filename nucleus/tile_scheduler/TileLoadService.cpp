@@ -48,20 +48,20 @@ void TileLoadService::load(const tile::Id& tile_id)
     request.setAttribute(QNetworkRequest::UseCredentialsAttribute, false);
 #endif
 
-    qDebug() << build_tile_url(tile_id);
-
     QNetworkReply* reply = m_network_manager->get(request);
     connect(reply, &QNetworkReply::finished, [tile_id, reply, this]() {
         const auto error = reply->error();
         const auto timestamp = utils::time_since_epoch();
         if (error == QNetworkReply::NoError) {
+            // qDebug() << reply->url().toString() << ": NoError";
             auto tile = std::make_shared<QByteArray>(reply->readAll());
             emit load_finished({tile_id, {tile_types::NetworkInfo::Status::Good, timestamp}, tile});
         } else if (error == QNetworkReply::ContentNotFoundError) {
+            // qDebug() << reply->url().toString() << ": ContentNotFoundError";
             auto tile = std::make_shared<QByteArray>();
             emit load_finished({tile_id, {tile_types::NetworkInfo::Status::NotFound, timestamp}, tile});
         } else {
-            //            qDebug() << reply->url() << ": " << error;
+            // qDebug() << reply->url().toString() << ": " << error;
             auto tile = std::make_shared<QByteArray>();
             emit load_finished({tile_id, {tile_types::NetworkInfo::Status::NetworkError, timestamp}, tile});
         }
