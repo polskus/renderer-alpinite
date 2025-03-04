@@ -73,7 +73,7 @@ Controller::Controller(AbstractRenderWindow* render_window)
     }
     m_data_querier = std::make_unique<DataQuerier>(&m_tile_scheduler->ram_cache());
     m_camera_controller = std::make_unique<nucleus::camera::Controller>(
-        nucleus::camera::PositionStorage::instance()->get("wien_innenstadt"), m_render_window->depth_tester(), m_data_querier.get());
+        nucleus::camera::PositionStorage::instance()->get("stephansdom_closeup"), m_render_window->depth_tester(), m_data_querier.get());
     {
         auto* sch = m_tile_scheduler.get();
         SlotLimiter* sl = new SlotLimiter(sch);
