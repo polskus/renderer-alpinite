@@ -48,7 +48,7 @@ Controller::Controller(AbstractRenderWindow* render_window)
     qRegisterMetaType<nucleus::event_parameter::Mouse>();
     qRegisterMetaType<nucleus::event_parameter::Wheel>();
 
-    m_gltf_terrain_service = std::make_unique<TileLoadService>("http://localhost/", TileLoadService::UrlPattern::ZYX_yPointingSouth, ".glb");
+    m_gltf_terrain_service = std::make_unique<TileLoadService>("http://localhost/", TileLoadService::UrlPattern::ZYX_yPointingSouth, ".simplified.glb");
 
     m_tile_scheduler = std::make_unique<nucleus::tile_scheduler::Scheduler>();
     m_tile_scheduler->read_disk_cache();
